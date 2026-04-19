@@ -1,0 +1,52 @@
+// MyGate — Prisma Schema
+// Two tables: User (residents, guards, admins) and Visit (visitor entry logs)
+
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String   @id @default(uuid())
+  name       String
+  phone      String   @unique
+  role       String   @default("resident") // resident | guard | admin
+  flatNumber String?  @map("flat_number")
+  societyId  String   @map("society_id")
+  status     String   @default("PENDING")  // PENDING | VERIFIED | REJECTED
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  // A resident receives visits; a guard logs visits
+  visitsAsResident Visit[] @relation("ResidentVisits")
+  visitsAsGuard    Visit[] @relation("GuardVisits")
+
+  @@map("users")
+}
+
+model Visit {
+  id           String    @id @default(uuid())
+  visitorName  String    @map("visitor_name")
+  visitorPhone String    @map("visitor_phone")
+  purpose      String    @default("guest")
+  flatNumber   String    @map("flat_number")
+  status       String    @default("PENDING") // PENDING | APPROVED | DENIED
+  entryTime    DateTime  @default(now()) @map("entry_time")
+  exitTime     DateTime? @map("exit_time")
+
+  residentId String @map("resident_id")
+  resident   User   @relation("ResidentVisits", fields: [residentId], references: [id])
+
+  guardId String @map("guard_id")
+  guard   User   @relation("GuardVisits", fields: [guardId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("visits")
+}

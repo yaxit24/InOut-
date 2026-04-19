@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: mygate-backend
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npx prisma db push --accept-data-loss && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: OTP_EXPIRY_SECONDS
+        value: 300
+      - key: DATABASE_URL
+        sync: false # User must provide this in the Render dashboard
