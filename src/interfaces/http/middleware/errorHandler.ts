@@ -51,6 +51,16 @@ export function errorHandler(
         return;
     }
 
+    if (err.message.includes('No resident found')) {
+        res.status(404).json({ error: err.message });
+        return;
+    }
+
+    if (err.message.includes('Invalid or expired OTP')) {
+        res.status(401).json({ error: err.message });
+        return;
+    }
+
     // Fallback — never leak stack traces in production
     res.status(500).json({
         error: process.env.NODE_ENV === 'development'
