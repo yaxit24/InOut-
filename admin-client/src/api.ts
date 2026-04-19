@@ -6,7 +6,7 @@ function getToken() {
 }
 
 export const api = axios.create({
-  baseURL: 'http://localhost:3000/api', // local backend
+  baseURL: 'https://mygate-x53m.onrender.com/api', // Live Production Backend
 });
 
 api.interceptors.request.use((config) => {
